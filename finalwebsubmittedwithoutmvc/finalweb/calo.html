@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Calendar</title>
+		
+		<style>
+		
+				html{
+				
+					background-color: 	#2F4F4F;
+					 min-width: 100%;
+					min-height: 100%;
+					background-position: top center;
+				
+				}
+				#body{
+					border:3px solid white;
+					margin: auto;
+					height:auto;
+					align:center;
+					vertical-align: middle; 
+					width:auto;
+					padding:10px;
+					background-color: lightblue;
+				
+				}
+				
+				#calendar-dates>table>tr>td:hover {
+					background-color: #555;
+					color: white;
+				}
+
+				#calendar-dates>table>tr>td{
+					padding-left: 30px;
+					padding-right: 30px;
+					padding-bottom:25px;
+					background-color: #66CDAA;
+					color: black;
+					font-size: 50px;
+					vertical-align: middle; 
+					border:2px solid black;
+					cursor: pointer;
+					
+				}
+				#calendar-month-year{
+ 
+					margin: auto;
+					font-size: 40px;
+					border: 2px solid black;
+					width:30%;
+					float:left;
+				}
+
+				
+				#today{
+					background-color: cyan !important;
+				}
+				
+
+				.clicked{
+					background-color: brown !important;
+				}
+
+				#header{
+		
+					border:2px solid black;
+					
+				}
+				#next{
+					cursor: pointer;
+					border:2px solid black;
+				}
+				#prev{
+					cursor: pointer;
+					border:2px solid black;
+				}
+				
+				#movebar,
+				#movebar ul{
+					list-style: none;
+					align:center;
+					padding:40px;
+					border: 1px;
+				}
+				#movebar>li{
+					
+					height:70px;
+					width:250px;
+					padding:25px;
+					border:3px solid black;
+					text-align:center;
+					background-color: #66CDAA;
+					font-family: arial;
+					font-size: 30px;
+					
+				}
+				#movebar>li:hover {
+						background-color: #555;
+						color: white;
+					}
+				#f{
+					
+					text-align:center;
+					font-family: arial;
+					font-size: 30px;
+				}
+				
+				
+				
+		</style>
+		
+       <!-- <link type="text/css" rel="stylesheet" href="cal.css"> -->
+        <script>
+            var pm=0,py=0,nm=0,ny=0;var d = new Date();
+            var month,year;
+            function x(){
+
+
+            var month_name = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+             month = d.getMonth();  //0-11
+             year = d.getFullYear(); //2014
+            var day=d.getDay();
+            var first_date = month_name[month] + " " + 1 + " " + year;
+            //September 1 2014
+            var tmp = new Date(first_date).toDateString();
+            //Mon Sep 01 2014 ...
+            var first_day = tmp.substring(0, 3);    //Mon
+            var day_name = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            var day_no = day_name.indexOf(first_day);   //1
+            var days = new Date(year, month+1, 0).getDate();    //30
+            //Tue Sep 30 2014 ...
+            var calendar = get_calendar(day_no, days);
+            document.getElementById("header").innerHTML = month_name[month]+" "+year;
+            document.getElementById("calendar-dates").innerHTML="";
+            document.getElementById("calendar-dates").appendChild(calendar);
+            document.getElementById("test").innerHTML=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear() ;
+
+        }
+        function f(val,id) {
+            var allDivTd=document.getElementById("calendar-dates").getElementsByTagName("td");
+            for(var i = 0; i < allDivTd.length; i++){
+                var td = allDivTd[i];
+                td.setAttribute("class","");
+            }
+            document.getElementById(id).setAttribute("class","clicked");
+            //alert(c);
+        }
+        function doubleClicked(val,id) {
+
+            window.location.href = "record.php?day="+val+"&month="+month+"&year="+year;
+
+        }
+        function get_calendar(day_no, days){
+            var n=0;
+            var d2 = new Date();
+            var table = document.createElement('table');
+            var tr = document.createElement('tr');
+
+            //row for the day letters
+            var dayss="SMTWTFS";
+            for(var c=0; c<=6; c++){
+                var td = document.createElement('td');
+                td.innerHTML = dayss[c];
+                td.setAttribute("id","clicked"+n);
+                td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                tr.appendChild(td);
+                n++;
+                //tr.id="aa";
+            }
+            table.appendChild(tr);
+
+            //create 2nd row blanks
+            tr = document.createElement('tr');
+            var c;
+            for(c=0; c<=6; c++){
+                if(c == day_no){
+                    break;
+                }
+                var td = document.createElement('td');
+                td.innerHTML = "";
+                td.setAttribute("id","clicked"+n);
+                td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                tr.appendChild(td);
+                n++;
+            }
+            //non blanks
+            var count = 1;
+            for(; c<=6; c++){
+                var td = document.createElement('td');
+                td.innerHTML = count;
+
+                count++;
+                td.setAttribute("id","clicked"+n);
+                td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                if(d2.getDate()==td.innerHTML){
+                    td.setAttribute("id","today");
+                }
+                tr.appendChild(td);
+                n++;
+            }
+            table.appendChild(tr);
+
+            //rest of the date rows
+            for(var r=3; r<=7; r++){
+                tr = document.createElement('tr');
+                for(var c=0; c<=6; c++){
+                    if(count > days){
+                        table.appendChild(tr);
+                        return table;
+                    }
+                    var td = document.createElement('td');
+                    td.innerHTML = count;
+
+                    count++;
+                    td.setAttribute("id","clicked"+n);
+                    td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                    td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                    if(d2.getDate()==td.innerHTML){
+                        td.setAttribute("id","today");
+                    }
+                    tr.appendChild(td);
+                    n++;
+                }
+                table.appendChild(tr);
+            }
+            return table;
+        } </script>
+    </head>
+    <body onload="x()">
+		
+		
+		<div id="body">
+            <div id="calendar-container">
+                <div id="calendar-header">
+
+                    <div id="calendar-month-year">
+                       
+						<ul id="movebar">
+						
+						<li id="prev" onclick="prev()"> Previous </li>
+						<li id="header">  </li>
+						<li id="next" onclick=" next()"> Next </li>
+				        </ul>
+                    </div>
+
+                </div>
+				<div id="date">
+                <div id="calendar-dates">
+                </div>
+				</div>
+            </div>
+			<div id="f">
+			 <a  href='home.php'>Go Home</a>
+			</div>
+		  </div>
+		
+
+    <span id="test"></span>
+    </body>
+</html>
+
+<script>
+    function prev(){
+
+        var month_name = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+         month -=1;  //0-11
+        if(month==-1){
+            month=11;year--;
+        }
+         //year = d.getFullYear()+ny; //2014
+        var day=d.getDay();
+        var first_date = month_name[month] + " " + 1 + " " + year;
+        //September 1 2014
+        var tmp = new Date(first_date).toDateString();
+        //Mon Sep 01 2014 ...
+        var first_day = tmp.substring(0, 3);    //Mon
+        var day_name = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var day_no = day_name.indexOf(first_day);   //1
+        var days = new Date(year, month+1, 0).getDate();    //30
+        //Tue Sep 30 2014 ...
+        var calendar = get_calendar(day_no, days);
+        document.getElementById("header").innerHTML = month_name[month]+" "+year;
+        document.getElementById("calendar-dates").innerHTML="";
+        document.getElementById("calendar-dates").appendChild(calendar);
+        document.getElementById("test").innerHTML=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear(); nm++ ;
+        if((month+nm)%12==0){
+            ny++;
+
+        }
+    }
+    function f(val,id) {
+        var allDivTd=document.getElementById("calendar-dates").getElementsByTagName("td");
+        for(var i = 0; i < allDivTd.length; i++){
+            var td = allDivTd[i];
+            td.setAttribute("class","");
+        }
+        document.getElementById(id).setAttribute("class","clicked");
+        //alert(c);
+    }
+    function doubleClicked(val,id) {
+
+        window.location.href = "record.php?day="+val+"&month="+month+"&year="+year;
+
+    }
+    function get_calendar(day_no, days){
+        var n=0;
+        var d2 = new Date();
+        var table = document.createElement('table');
+        var tr = document.createElement('tr');
+
+        //row for the day letters
+        var dayss="SMTWTFS";
+        for(var c=0; c<=6; c++){
+            var td = document.createElement('td');
+            td.innerHTML = dayss[c];
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            tr.appendChild(td);
+            n++;
+            //tr.id="aa";
+        }
+        table.appendChild(tr);
+
+        //create 2nd row blanks
+        tr = document.createElement('tr');
+        var c;
+        for(c=0; c<=6; c++){
+            if(c == day_no){
+                break;
+            }
+            var td = document.createElement('td');
+            td.innerHTML = "";
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            tr.appendChild(td);
+            n++;
+        }
+        //non blanks
+        var count = 1;
+        for(; c<=6; c++){
+            var td = document.createElement('td');
+            td.innerHTML = count;
+
+            count++;
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            if(d2.getDate()==td.innerHTML){
+                td.setAttribute("id","today");
+            }
+            tr.appendChild(td);
+            n++;
+        }
+        table.appendChild(tr);
+
+        //rest of the date rows
+        for(var r=3; r<=7; r++){
+            tr = document.createElement('tr');
+            for(var c=0; c<=6; c++){
+                if(count > days){
+                    table.appendChild(tr);
+                    return table;
+                }
+                var td = document.createElement('td');
+                td.innerHTML = count;
+
+                count++;
+                td.setAttribute("id","clicked"+n);
+                td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                if(d2.getDate()==td.innerHTML){
+                    td.setAttribute("id","today");
+                }
+                tr.appendChild(td);
+                n++;
+            }
+            table.appendChild(tr);
+        }
+        return table;
+    }
+    function next(){
+        var month_name = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+        month +=1;  //0-11
+        if(month==12){
+            month=0;
+            year++;
+
+        }
+        // year = d.getFullYear()+ny; //2014
+        var day=d.getDay();
+        var first_date = month_name[month] + " " + 1 + " " + year;
+        //September 1 2014
+        var tmp = new Date(first_date).toDateString();
+        //Mon Sep 01 2014 ...
+        var first_day = tmp.substring(0, 3);    //Mon
+        var day_name = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var day_no = day_name.indexOf(first_day);   //1
+        var days = new Date(year, month+1, 0).getDate();    //30
+        //Tue Sep 30 2014 ...
+        var calendar = get_calendar(day_no, days);
+        document.getElementById("header").innerHTML = month_name[month]+" "+year;
+        document.getElementById("calendar-dates").innerHTML="";
+        document.getElementById("calendar-dates").appendChild(calendar);
+        document.getElementById("test").innerHTML=d.getDate()+"/"+d.getMonth()+"/"+d.getFullYear() ;
+
+    }
+    function f(val,id) {
+        var allDivTd=document.getElementById("calendar-dates").getElementsByTagName("td");
+        for(var i = 0; i < allDivTd.length; i++){
+            var td = allDivTd[i];
+            td.setAttribute("class","");
+        }
+        document.getElementById(id).setAttribute("class","clicked");
+        //alert(c);
+    }
+    function doubleClicked(val,id) {
+
+        window.location.href = "record.php?day="+val+"&month="+month+"&year="+year;
+
+    }
+    function get_calendar(day_no, days){
+        var n=0;
+        var d2 = new Date();
+        var table = document.createElement('table');
+        var tr = document.createElement('tr');
+
+        //row for the day letters
+        var dayss="SMTWTFS";
+        for(var c=0; c<=6; c++){
+            var td = document.createElement('td');
+            td.innerHTML = dayss[c];
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            tr.appendChild(td);
+            n++;
+            //tr.id="aa";
+        }
+        table.appendChild(tr);
+
+        //create 2nd row blanks
+        tr = document.createElement('tr');
+        var c;
+        for(c=0; c<=6; c++){
+            if(c == day_no){
+                break;
+            }
+            var td = document.createElement('td');
+            td.innerHTML = "";
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            tr.appendChild(td);
+            n++;
+        }
+        //non blanks
+        var count = 1;
+        for(; c<=6; c++){
+            var td = document.createElement('td');
+            td.innerHTML = count;
+
+            count++;
+            td.setAttribute("id","clicked"+n);
+            td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+            td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+            if(d2.getDate()==td.innerHTML){
+                td.setAttribute("id","today");
+            }
+            tr.appendChild(td);
+            n++;
+        }
+        table.appendChild(tr);
+
+        //rest of the date rows
+        for(var r=3; r<=7; r++){
+            tr = document.createElement('tr');
+            for(var c=0; c<=6; c++){
+                if(count > days){
+                    table.appendChild(tr);
+                    return table;
+                }
+                var td = document.createElement('td');
+                td.innerHTML = count;
+
+                count++;
+                td.setAttribute("id","clicked"+n);
+                td.setAttribute("onclick","f('"+td.innerHTML+"','clicked"+n+"')");
+                td.setAttribute("ondblclick","doubleClicked('"+td.innerHTML+"','clicked"+n+"')");
+                if(d2.getDate()==td.innerHTML){
+                    td.setAttribute("id","today");
+                }
+                tr.appendChild(td);
+                n++;
+            }
+            table.appendChild(tr);
+        }
+        return table;
+    }
+</script>
